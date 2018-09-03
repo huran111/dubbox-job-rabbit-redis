@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <!-- 应用配置 各业务平台根据name区分 -->
+    <dubbo:application name="lwjc-event-provider" owner="lwjk-event" organization="jszx"/>
+    <!-- 记录访问日志 -->
+    <dubbo:protocol accesslog="D:\\bar.log"/>
+
+
+    <!--zookeeper注册中心 -->
+
+    <dubbo:registry protocol="zookeeper" address="192.168.10.158:2181"/>
+    <dubbo:protocol name="dubbo" port="20885"></dubbo:protocol>
+
+
+    <dubbo:service timeout="5000" connections="100" interface="com.xz.lwjk.event.facade.service.IUserService"
+                   ref="userService"
+                   protocol="dubbo" version="0.0.1"/>
+    <bean id="userService" class="com.xz.lwjk.event.facade.service.impl.UserServiceImpl"/>
+</beans>

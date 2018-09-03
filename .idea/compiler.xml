@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="xz_lujk_event_base" />
+        <module name="xz_lwjk_event_common" />
+        <module name="xz_lwjk_event_facade" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="xz_lujk_event_base" target="1.8" />
+      <module name="xz_lwjk_event_base" target="1.5" />
+      <module name="xz_lwjk_event_common" target="1.5" />
+      <module name="xz_lwjk_event_entity" target="1.5" />
+      <module name="xz_lwjk_event_facade" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
