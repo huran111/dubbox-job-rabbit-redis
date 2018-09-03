@@ -3,6 +3,14 @@ server:
 spring:
   profiles:
     active: dev
+  rabbitmq:
+    publisher-confirms: true
+    publisher-returns: true
+    addresses: localhost:5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 15000
   redis:
     database: 0
     host: 192.168.10.158
@@ -36,7 +44,9 @@ spring:
     filters: stat,wall,log4j
     # 通过connectProperties属性来打开mergeSql功能；慢SQL记录
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
-
+mybatis:
+  mapper-locations: classpath:mapping/*.xml  #注意：一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.xz.lwjk.event.facade.model  # 注意：对应实体类的路径
   jpa:
     hibernate:
       ddl-auto: update
@@ -49,4 +59,9 @@ job:
   zookeeper:
     address:
       192.168.10.158:2181
-
+#pagehelper分页插件
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
