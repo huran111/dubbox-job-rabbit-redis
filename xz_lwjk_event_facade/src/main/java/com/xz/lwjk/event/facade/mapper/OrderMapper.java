@@ -1,6 +1,7 @@
 package com.xz.lwjk.event.facade.mapper;
 
-import com.xz.lwjk.event.facade.model.Order;
+
+import com.event.common.entity.Order;
 
 public interface OrderMapper {
     int deleteByPrimaryKey(String id);

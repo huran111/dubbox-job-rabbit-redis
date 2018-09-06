@@ -1,8 +1,8 @@
 package com.xz.lwjk.event.facade.producer;
 
+import com.event.common.entity.Order;
 import com.xz.lwjk.event.facade.constant.Constants;
 import com.xz.lwjk.event.facade.mapper.BrokerMessageLogMapper;
-import com.xz.lwjk.event.facade.model.Order;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.support.CorrelationData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +29,7 @@ public class RabbitOrderSend {
         public void confirm(CorrelationData correlationData, boolean ack, String s) {
             System.out.println("correlationData:" + correlationData);
             String messageId = correlationData.getId();
+            System.out.println("消息ID为:"+messageId);
             if (ack) {
                 //如果返回成功 则进行 更新
                 brokerMessageLogMapper.changeBrokerMessageLogStatus(messageId, Constants.ORDER_SEND_SUCCESS,new Date());
@@ -41,8 +42,9 @@ public class RabbitOrderSend {
     public void senOrder(Order order) {
         //设置监听回调函数
         rabbitTemplate.setConfirmCallback(confirmCallback);
-        CorrelationData correlationData = new CorrelationData(order.getMessageId());
-        rabbitTemplate.convertAndSend("order-exchange", "order-abcd", order, correlationData);
+        CorrelationData correlation = new CorrelationData();
+       correlation.setId(order.getMessageId());
+        rabbitTemplate.convertAndSend("order-exchange", "order.abcd", order, correlation);
 
     }
 }

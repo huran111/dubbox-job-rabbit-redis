@@ -2,11 +2,11 @@ package com.xz.lwjk.event.facade.producer;
 
 import com.alibaba.fastjson.JSON;
 
+import com.event.common.entity.Order;
 import com.xz.lwjk.event.facade.constant.Constants;
 import com.xz.lwjk.event.facade.mapper.BrokerMessageLogMapper;
 import com.xz.lwjk.event.facade.mapper.OrderMapper;
 import com.xz.lwjk.event.facade.model.BrokerMessageLog;
-import com.xz.lwjk.event.facade.model.Order;
 import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

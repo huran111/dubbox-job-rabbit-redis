@@ -4,7 +4,6 @@ package com.xz.lwjk.event.facade.common.service;
 import com.event.common.entity.BaseEntity;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @Auther: huran

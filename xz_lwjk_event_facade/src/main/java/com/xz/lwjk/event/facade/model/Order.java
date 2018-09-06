@@ -1,6 +1,8 @@
 package com.xz.lwjk.event.facade.model;
 
-public class Order {
+import java.io.Serializable;
+
+public class Order  implements Serializable{
     private String id;
 
     private String name;
