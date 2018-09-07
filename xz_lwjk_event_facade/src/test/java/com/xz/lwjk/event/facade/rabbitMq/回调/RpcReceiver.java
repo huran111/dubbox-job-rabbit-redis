@@ -1,7 +1,7 @@
 package com.xz.lwjk.event.facade.rabbitMq.回调;
 
 import com.rabbitmq.client.*;
-import com.rabbitmq.client.AMQP.BasicProperties;
+import org.apache.commons.lang.SerializationUtils;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -12,35 +12,50 @@ import java.util.concurrent.TimeoutException;
  * @Description:
  */
 public class RpcReceiver {
-    private static String requestQueueName = "rpc_queue";
+    public static void main(String[] args) throws IOException, InterruptedException, TimeoutException {
 
-    public static void main(String[] args) throws IOException, ShutdownSignalException, ConsumerCancelledException, InterruptedException, TimeoutException {
-        // 创建连接和频道
+        String exchangeName = "rpc_exchange";   //交换器名称
+        String queueName = "rpc_queue";     //队列名称
+        String routingKey = "rpc_key";  //路由键
+
         ConnectionFactory factory = new ConnectionFactory();
+        factory.setVirtualHost("test");
         factory.setHost("localhost");
-        Connection connection = factory.newConnection();
-        //声明队列，主要为了防止消息接收者先运行此程序，队列还不存在时创建队列。
+        factory.setPort(5672);
+        factory.setUsername("guest");
+        factory.setPassword("guest");
+        Connection connection = factory.newConnection();    //创建链接
+
         Channel channel = connection.createChannel();
-        channel.queueDeclare(requestQueueName, false, false, false, null);
-        //创建队列消费者
-        QueueingConsumer consumer = new QueueingConsumer(channel);
-        //指定消费队列 打开ack机制
-        channel.basicConsume(requestQueueName, false, consumer);
+
+        channel.exchangeDeclare(exchangeName, "topic", false, false, null);    //定义交换器
+
+        channel.queueDeclare(queueName, false, false, false, null); //定义队列
+
+        channel.queueBind(queueName, exchangeName, routingKey, null); //绑定队列
+
+        QueueingConsumer consumer = new QueueingConsumer(channel);     //创建一个消费者
+
+        channel.basicConsume(queueName, true, consumer);  //消费消息
+
         while (true) {
-            //nextDelivery是一个阻塞方法（内部实现其实是阻塞队列的take方法）
-            QueueingConsumer.Delivery delivery = consumer.nextDelivery();
-            String message = new String(delivery.getBody());
-            System.out.println("收到客户端发来的消息:" + message);
-            //获取回调队列名与Correlation Id
-            BasicProperties bpro = delivery.getProperties();
-            String replName = bpro.getReplyTo();
-            System.out.println("服务端队列名称:"+replName);
-            BasicProperties replBP = new BasicProperties().builder().correlationId(bpro.getCorrelationId()).build();
-          System.out.print("服务端的getCorrelationId"+ delivery.getProperties().getCorrelationId());
-            String responseMsg = "Just Do It";
-            channel.basicPublish("", replName, replBP, responseMsg.getBytes());
-            //发送应答，通过delivery.getEnvelope().getDeliveryTag()获取此次确认的消息的序列号
-            channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+
+            QueueingConsumer.Delivery delivery = consumer.nextDelivery();  //获得一条消息
+
+            String correlationID = delivery.getProperties().getCorrelationId();    //获得额外携带的correlationID
+
+            String replyTo = delivery.getProperties().getReplyTo(); //获得回调的队列路由键
+
+            String body = (String) SerializationUtils.deserialize(delivery.getBody());  //获得请求的内容
+            System.out.println("客户端发送的内容:"+body);
+            String responseMsg = "welcome " + body; //处理返回内容
+
+            AMQP.BasicProperties properties = new AMQP.BasicProperties.Builder()
+                    .correlationId(correlationID)   //返回消息时携带 请求时传过来的correlationID
+                    .build();
+
+            channel.basicPublish("", replyTo, properties, SerializationUtils.serialize(responseMsg)); //返回处理结果
+
         }
     }
 }
